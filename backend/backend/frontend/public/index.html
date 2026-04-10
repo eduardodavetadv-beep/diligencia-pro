@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiligênciaPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #09090c;
+  --s1: #101014;
+  --s2: #16161c;
+  --s3: #1c1c24;
+  --b1: #22222e;
+  --b2: #2e2e3e;
+  --gold: #c8a84a;
+  --gold2: #e6c96a;
+  --gdim: rgba(200,168,74,.12);
+  --gglow: rgba(200,168,74,.22);
+  --red: #e05555;
+  --green: #4cb884;
+  --blue: #5b8def;
+  --purple: #9b7de8;
+  --text: #e6e2d8;
+  --t2: #888fa8;
+  --t3: #484e68;
+  --t4: #2e3248;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;min-height:100vh;overflow-x:hidden}
+
+/* grain */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+
+/* ── Header ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--b1);background:linear-gradient(180deg,rgba(200,168,74,.05) 0%,transparent 100%)}
+.logo-name{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--gold2);letter-spacing:-.3px}
+.logo-sub{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.status-pill{font-size:10px;padding:5px 12px;border-radius:20px;border:1px solid var(--b2);color:var(--t3);display:flex;align-items:center;gap:6px}
+.status-pill.online .dot-status{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-pill.offline .dot-status{background:var(--red)}
+.dot-status{width:6px;height:6px;border-radius:50%}
+
+/* ── Main ── */
+.main{max-width:1080px;margin:0 auto;padding:40px 40px}
+
+/* ── Search panel ── */
+.spanel{background:var(--s1);border:1px solid var(--b1);border-radius:4px;padding:28px 32px;margin-bottom:32px;position:relative;overflow:hidden}
+.spanel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--gold) 50%,transparent 100%)}
+.spanel-title{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+
+.type-tabs{display:flex;gap:4px;margin-bottom:18px}
+.tab{padding:6px 18px;border:1px solid var(--b1);border-radius:2px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--t3);transition:all .15s}
+.tab.on{background:var(--gdim);border-color:var(--gold);color:var(--gold)}
+
+.srow{display:grid;grid-template-columns:1fr 200px 140px;gap:10px;align-items:end}
+.fgroup{display:flex;flex-direction:column;gap:7px}
+.flabel{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3)}
+.finput{background:var(--bg);border:1px solid var(--b2);color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:11px 15px;border-radius:2px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.finput:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gdim)}
+.finput::placeholder{color:var(--t3)}
+
+.btn{padding:11px 20px;border:none;border-radius:2px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;height:44px}
+.btn-go{background:var(--gold);color:#09090c;font-weight:500}
+.btn-go:hover{background:var(--gold2);box-shadow:0 4px 20px var(--gglow);transform:translateY(-1px)}
+.btn-go:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-clr{background:transparent;color:var(--t2);border:1px solid var(--b2)}
+.btn-clr:hover{border-color:var(--b2);color:var(--text)}
+
+/* ── Progress bar ── */
+.progress-wrap{margin-top:20px;display:none}
+.progress-wrap.show{display:block}
+.progress-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;justify-content:space-between}
+.progress-bar{height:2px;background:var(--b1);border-radius:1px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:1px;transition:width .4s ease;width:0%}
+.progress-steps{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pstep{font-size:9px;padding:3px 8px;border-radius:2px;border:1px solid var(--b1);color:var(--t3);transition:all .3s}
+.pstep.running{border-color:var(--gold);color:var(--gold);background:var(--gdim)}
+.pstep.done{border-color:var(--green);color:var(--green);background:rgba(76,184,132,.08)}
+.pstep.fail{border-color:var(--red);color:var(--red);background:rgba(224,85,85,.08)}
+
+/* ── Summary cards ── */
+.sumgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.scard{background:var(--s1);border:1px solid var(--b1);border-radius:3px;padding:16px 18px;text-align:center;position:relative;overflow:hidden;animation:fadeUp .4s ease}
+.scard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.scard.c-red::after{background:var(--red)} .scard.c-gold::after{background:var(--gold)}
+.scard.c-grn::after{background:var(--green)} .scard.c-blue::after{background:var(--blue)}
+.scard.c-purple::after{background:var(--purple)}
+.snum{font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:4px}
+.scard.c-red .snum{color:var(--red)} .scard.c-gold .snum{color:var(--gold)}
+.scard.c-grn .snum{color:var(--green)} .scard.c-blue .snum{color:var(--blue)}
+.scard.c-purple .snum{color:var(--purple)}
+.slabel{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+
+/* ── Sections ── */
+.section{background:var(--s1);border:1px solid var(--b1);border-radius:4px;margin-bottom:12px;overflow:hidden;animation:fadeUp .35s ease}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .15s;user-select:none}
+.sec-head:hover{background:var(--s2)}
+.sec-left{display:flex;align-items:center;gap:10px}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.d-ok{background:var(--green);box-shadow:0 0 7px var(--green)}
+.d-warn{background:var(--gold);box-shadow:0 0 7px var(--gold)}
+.d-err{background:var(--red);box-shadow:0 0 7px var(--red)}
+.d-idle{background:var(--t4)}
+.d-spin{background:var(--gold);animation:dotpulse 1.2s infinite}
+@keyframes dotpulse{0%,100%{opacity:1;box-shadow:0 0 7px var(--gold)}50%{opacity:.3;box-shadow:none}}
+.sec-title{font-family:'Fraunces',serif;font-size:14px;font-weight:300;color:var(--text)}
+.badge{font-size:10px;padding:3px 10px;border-radius:20px;background:var(--s2);border:1px solid var(--b1);color:var(--t3);white-space:nowrap}
+.badge.has{background:rgba(200,168,74,.14);border-color:var(--gold);color:var(--gold)}
+.badge.ok{background:rgba(76,184,132,.12);border-color:var(--green);color:var(--green)}
+.badge.err{background:rgba(224,85,85,.1);border-color:var(--red);color:var(--red)}
+.sec-body{display:none;padding:18px}
+.sec-body.open{display:block}
+
+/* ── Company fields ── */
+.cfields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.cf{background:var(--bg);border:1px solid var(--b1);padding:10px 14px;border-radius:2px}
+.cf.wide{grid-column:1/-1} .cf.w2{grid-column:span 2}
+.cfl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.cfv{font-size:13px;color:var(--text);line-height:1.4}
+.cfv.hi{color:var(--gold)} .cfv.ok{color:var(--green)} .cfv.warn{color:var(--red)}
+.cfv.big{font-family:'Fraunces',serif;font-size:17px;font-weight:300}
+
+/* ── Table ── */
+.ptable{width:100%;border-collapse:collapse}
+.ptable th{text-align:left;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);padding:8px 12px;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:0}
+.ptable td{padding:11px 12px;border-bottom:1px solid var(--b1);font-size:11px;color:var(--t2);vertical-align:top;line-height:1.4}
+.ptable tr:last-child td{border-bottom:none}
+.ptable tr:hover td{background:var(--s2)}
+.pnum{font-family:'DM Mono',monospace;color:var(--gold);font-size:11px;white-space:nowrap;font-weight:500}
+.pill{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;letter-spacing:.05em;border:1px solid}
+.p-civel{background:rgba(91,141,239,.12);color:var(--blue);border-color:rgba(91,141,239,.3)}
+.p-trab{background:rgba(200,168,74,.12);color:var(--gold);border-color:rgba(200,168,74,.3)}
+.p-trib{background:rgba(224,85,85,.12);color:var(--red);border-color:rgba(224,85,85,.3)}
+.p-exec{background:rgba(76,184,132,.12);color:var(--green);border-color:rgba(76,184,132,.3)}
+.p-crim{background:rgba(155,125,232,.12);color:var(--purple);border-color:rgba(155,125,232,.3)}
+
+/* ── Tribunal groups ── */
+.trib-group{margin-bottom:16px}
+.trib-group-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding-bottom:8px;border-bottom:1px solid var(--b1);margin-bottom:10px}
+.trib-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:2px;margin-bottom:6px;transition:all .2s}
+.trib-row.found{border-color:rgba(200,168,74,.4);background:rgba(200,168,74,.04)}
+.trib-row.empty{opacity:.5}
+.trib-row.loading{border-color:var(--b2)}
+.trib-name{font-size:12px;color:var(--text);font-weight:500}
+.trib-count{font-size:11px;padding:2px 10px;border-radius:20px}
+.tc-found{background:rgba(200,168,74,.15);color:var(--gold);border:1px solid rgba(200,168,74,.3)}
+.tc-zero{color:var(--t3);border:1px solid var(--b1);background:transparent}
+.tc-err{color:var(--red);border:1px solid rgba(224,85,85,.2);background:rgba(224,85,85,.06)}
+.tc-load{color:var(--t3);border:1px solid var(--b1);animation:dotpulse 1.2s infinite}
+
+/* ── QSA table ── */
+.qsa-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin:16px 0 10px}
+
+/* ── Empty / error ── */
+.empty{text-align:center;padding:50px 20px;color:var(--t3)}
+.empty-icon{font-size:36px;opacity:.25;margin-bottom:14px}
+.empty-t{font-family:'Fraunces',serif;font-size:17px;font-weight:300;color:var(--t3);margin-bottom:6px}
+.empty-s{font-size:11px;opacity:.5}
+.errmsg{background:rgba(224,85,85,.07);border:1px solid rgba(224,85,85,.2);border-radius:2px;padding:12px 16px;color:var(--red);font-size:11px;line-height:1.6}
+.errmsg a{color:var(--gold)}
+.notice{background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.18);border-radius:2px;padding:10px 14px;font-size:10px;color:var(--t3);line-height:1.6;margin-top:12px}
+.notice strong{color:var(--gold)}
+
+/* ── API config ── */
+.api-cfg{background:var(--s2);border:1px solid var(--b1);border-radius:2px;padding:12px 16px;margin-top:14px;font-size:11px;color:var(--t2);display:flex;align-items:center;gap:10px}
+.api-input{background:var(--bg);border:1px solid var(--b2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;border-radius:2px;outline:none;flex:1}
+.api-input:focus{border-color:var(--gold)}
+.api-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);white-space:nowrap}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ── Overflow table wrapper ── */
+.table-wrap{overflow-x:auto;max-height:400px;overflow-y:auto;border-radius:2px;border:1px solid var(--b1)}
+
+@media(max-width:768px){
+  .main{padding:20px 14px}
+  .hdr{padding:14px 16px}
+  .srow{grid-template-columns:1fr}
+  .sumgrid{grid-template-columns:1fr 1fr}
+  .cfields{grid-template-columns:1fr 1fr}
+  .cf.wide,.cf.w2{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div>
+    <div class="logo-name">DiligênciaPRO</div>
+    <div class="logo-sub">Pesquisa Jurídica &amp; Patrimonial Automatizada</div>
+  </div>
+  <div class="hdr-right">
+    <div class="status-pill offline" id="status-pill">
+      <div class="dot-status"></div>
+      <span id="status-txt">verificando...</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Search Panel -->
+  <div class="spanel">
+    <div class="spanel-title">// Identificação do Pesquisado</div>
+
+    <div class="type-tabs">
+      <button class="tab on" id="tab-cnpj" onclick="setType('cnpj')">CNPJ — Pessoa Jurídica</button>
+      <button class="tab" id="tab-cpf" onclick="setType('cpf')">CPF — Pessoa Física</button>
+    </div>
+
+    <div class="srow">
+      <div class="fgroup">
+        <label class="flabel" id="doc-lbl">CNPJ</label>
+        <input class="finput" id="doc-in" type="text" placeholder="00.000.000/0001-00" maxlength="18" oninput="fmtDoc(this)">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Nome / Razão Social</label>
+        <input class="finput" id="nome-in" type="text" placeholder="Opcional — melhora busca">
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-go" id="btn-go" onclick="run()">Pesquisar</button>
+        <button class="btn btn-clr" onclick="reset()">✕</button>
+      </div>
+    </div>
+
+    <!-- API URL config -->
+    <div class="api-cfg">
+      <span class="api-lbl">Backend URL</span>
+      <input class="api-input" id="api-url" value="http://localhost:3000" placeholder="https://diligencia-pro.onrender.com">
+      <button class="btn btn-clr" style="height:32px;font-size:9px" onclick="checkStatus()">Testar</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="prog-wrap">
+      <div class="progress-label">
+        <span id="prog-label">Consultando fontes...</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+      <div class="progress-steps" id="prog-steps"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="empty">
+      <div class="empty-icon">⚖</div>
+      <div class="empty-t">Nenhuma pesquisa iniciada</div>
+      <div class="empty-s">Informe o CNPJ ou CPF para consulta automática nos tribunais</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════════
+let docType = 'cnpj';
+let pesquisaAtiva = false;
+
+function getAPI() { return (document.getElementById('api-url').value || 'http://localhost:3000').replace(/\/$/, ''); }
+
+// ═══════════════════════════════════════════════════
+// STATUS CHECK
+// ═══════════════════════════════════════════════════
+async function checkStatus() {
+  const pill = document.getElementById('status-pill');
+  const txt = document.getElementById('status-txt');
+  txt.textContent = 'verificando...';
+  pill.className = 'status-pill offline';
+  try {
+    const r = await fetch(getAPI() + '/api/status', { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    if (d.status === 'online') {
+      pill.className = 'status-pill online';
+      txt.textContent = 'backend online';
+    } else throw new Error();
+  } catch {
+    pill.className = 'status-pill offline';
+    txt.textContent = 'backend offline';
+  }
+}
+checkStatus();
+setInterval(checkStatus, 30000);
+
+// ═══════════════════════════════════════════════════
+// DOC TYPE & FORMAT
+// ═══════════════════════════════════════════════════
+function setType(t) {
+  docType = t;
+  document.getElementById('tab-cnpj').className = 'tab' + (t === 'cnpj' ? ' on' : '');
+  document.getElementById('tab-cpf').className  = 'tab' + (t === 'cpf'  ? ' on' : '');
+  document.getElementById('doc-lbl').textContent = t.toUpperCase();
+  const i = document.getElementById('doc-in');
+  i.placeholder = t === 'cnpj' ? '00.000.000/0001-00' : '000.000.000-00';
+  i.maxLength = t === 'cnpj' ? 18 : 14;
+  i.value = '';
+}
+
+function fmtDoc(el) {
+  let v = el.value.replace(/\D/g, '');
+  if (docType === 'cnpj') {
+    v = v.slice(0,14);
+    if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+    else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+  } else {
+    v = v.slice(0,11);
+    if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+    else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    else if (v.length > 3) v = v.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
+  }
+  el.value = v;
+}
+
+function reset() {
+  document.getElementById('doc-in').value = '';
+  document.getElementById('nome-in').value = '';
+  document.getElementById('results').innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⚖</div>
+      <div class="empty-t">Nenhuma pesquisa iniciada</div>
+      <div class="empty-s">Informe o CNPJ ou CPF para consulta automática nos tribunais</div>
+    </div>`;
+  setProgress(0, '');
+  document.getElementById('prog-wrap').classList.remove('show');
+  document.getElementById('prog-steps').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════
+const STEPS = ['Receita Federal', 'DataJud/CNJ', 'TJs Estaduais', 'TRFs', 'TST', 'JusBrasil'];
+
+function initProgress() {
+  document.getElementById('prog-wrap').classList.add('show');
+  const stepsEl = document.getElementById('prog-steps');
+  stepsEl.innerHTML = STEPS.map((s,i) =>
+    `<span class="pstep" id="ps-${i}">${s}</span>`
+  ).join('');
+  setProgress(0, 'Iniciando consultas...');
+}
+
+function setProgress(pct, label) {
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = Math.round(pct) + '%';
+  if (label) document.getElementById('prog-label').textContent = label;
+}
+
+function stepRun(i)  { const el = document.getElementById(`ps-${i}`); if (el) { el.className = 'pstep running'; } }
+function stepDone(i) { const el = document.getElementById(`ps-${i}`); if (el) { el.className = 'pstep done'; } }
+function stepFail(i) { const el = document.getElementById(`ps-${i}`); if (el) { el.className = 'pstep fail'; } }
+
+// ═══════════════════════════════════════════════════
+// MAIN RUN
+// ═══════════════════════════════════════════════════
+async function run() {
+  if (pesquisaAtiva) return;
+  const docRaw = document.getElementById('doc-in').value;
+  const docClean = docRaw.replace(/\D/g, '');
+  const nome = document.getElementById('nome-in').value.trim();
+
+  if (docType === 'cnpj' && docClean.length !== 14) return alert('CNPJ inválido — informe os 14 dígitos.');
+  if (docType === 'cpf'  && docClean.length !== 11) return alert('CPF inválido — informe os 11 dígitos.');
+
+  pesquisaAtiva = true;
+  const btn = document.getElementById('btn-go');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Consultando...';
+
+  const res = document.getElementById('results');
+  res.innerHTML = '';
+  initProgress();
+
+  // Shared state
+  let totalProcessos = 0;
+  let totalTribunais = 0;
+  let nomeEmpresa = nome;
+
+  // ── 1. Receita Federal ──────────────────────────────
+  if (docType === 'cnpj') {
+    stepRun(0);
+    setProgress(5, 'Consultando Receita Federal...');
+    const secRFB = mkSection(res, 'rfb', 'Receita Federal — Dados Cadastrais', 'spin');
+    secRFB.body.classList.add('open');
+    secRFB.body.innerHTML = '<span class="spin"></span>Aguardando resposta da API...';
+
+    try {
+      const r = await fetch(`${getAPI()}/api/receita/${docClean}`);
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      nomeEmpresa = d.razao_social || nomeEmpresa;
+      if (!document.getElementById('nome-in').value) document.getElementById('nome-in').value = nomeEmpresa;
+
+      const ativa = (d.situacao_cadastral || d.situacao || '').toUpperCase().includes('ATIVA');
+      setDot(secRFB.dot, ativa ? 'ok' : 'warn');
+      setBadge(secRFB.badge, 'OK', 'ok');
+
+      const capital = d.capital_social
+        ? 'R$ ' + Number(d.capital_social).toLocaleString('pt-BR', {minimumFractionDigits:2})
+        : (d.capital_social_formatado || '—');
+
+      const socios = (d.qsa || d.socios || []);
+      const socioRows = socios.map(s => `
+        <tr>
+          <td style="color:var(--text)">${s.nome_socio || s.nome || '—'}</td>
+          <td>${s.qualificacao_socio?.descricao || s.qualificacao_socio || s.qualificacao || '—'}</td>
+          <td>${s.cpf_representante_legal || s.cnpj_cpf_do_socio || s.documento || '—'}</td>
+        </tr>`).join('') || '<tr><td colspan="3" style="color:var(--t3)">—</td></tr>';
+
+      secRFB.body.innerHTML = `
+        <div class="cfields">
+          <div class="cf wide"><div class="cfl">Razão Social</div>
+            <div class="cfv big hi">${d.razao_social || d.nome || '—'}</div>
+            ${d.nome_fantasia ? `<div style="font-size:11px;color:var(--t3);margin-top:3px">${d.nome_fantasia}</div>` : ''}
+          </div>
+          <div class="cf"><div class="cfl">Situação</div>
+            <div class="cfv ${ativa ? 'ok' : 'warn'}">${d.situacao_cadastral || d.situacao || '—'}</div>
+          </div>
+          <div class="cf"><div class="cfl">Abertura</div>
+            <div class="cfv">${d.data_inicio_atividade || d.abertura || '—'}</div>
+          </div>
+          <div class="cf"><div class="cfl">Capital Social</div>
+            <div class="cfv hi">${capital}</div>
+          </div>
+          <div class="cf"><div class="cfl">Porte</div>
+            <div class="cfv">${d.porte?.descricao || d.porte || '—'}</div>
+          </div>
+          <div class="cf"><div class="cfl">Município / UF</div>
+            <div class="cfv">${d.municipio?.descricao || d.municipio || '—'} / ${d.uf || '—'}</div>
+          </div>
+          <div class="cf"><div class="cfl">Natureza Jurídica</div>
+            <div class="cfv">${d.natureza_juridica?.descricao || d.natureza_juridica || '—'}</div>
+          </div>
+          <div class="cf w2"><div class="cfl">CNAE Principal</div>
+            <div class="cfv">${d.cnae_fiscal_descricao || d.atividade_principal?.[0]?.text || '—'}</div>
+          </div>
+          <div class="cf"><div class="cfl">Telefone</div>
+            <div class="cfv">${d.ddd_telefone_1 ? '(' + d.ddd_telefone_1 + ') ' + (d.telefone_1 || '') : (d.telefone || '—')}</div>
+          </div>
+          <div class="cf w2"><div class="cfl">E-mail</div>
+            <div class="cfv">${d.email || '—'}</div>
+          </div>
+        </div>
+        ${socios.length > 0 ? `
+          <div class="qsa-title">Quadro Societário (QSA) — ${socios.length} sócio(s)</div>
+          <div class="table-wrap">
+            <table class="ptable">
+              <thead><tr><th>Nome</th><th>Qualificação</th><th>CPF/CNPJ</th></tr></thead>
+              <tbody>${socioRows}</tbody>
+            </table>
+          </div>` : ''}
+      `;
+      stepDone(0);
+    } catch (e) {
+      setDot(secRFB.dot, 'err');
+      setBadge(secRFB.badge, 'Erro', 'err');
+      secRFB.body.innerHTML = `<div class="errmsg">⚠ ${e.message}<br>
+        <a href="https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/Cnpjreva_Solicitacao.asp" target="_blank">→ Consultar manualmente na RFB</a></div>`;
+      stepFail(0);
+    }
+  }
+
+  // ── 2. DataJud — todos tribunais ────────────────────
+  stepRun(1); stepRun(2); stepRun(3);
+  setProgress(20, 'Consultando DataJud (CNJ) — 15+ tribunais em paralelo...');
+
+  const secDJ = mkSection(res, 'datajud', 'DataJud / CNJ — Processos em Todos os Tribunais', 'spin');
+  secDJ.body.classList.add('open');
+  secDJ.body.innerHTML = '<span class="spin"></span>Consultando 15 tribunais simultaneamente...';
+
+  try {
+    const r = await fetch(`${getAPI()}/api/datajud/todos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documento: docRaw, tipo: docType, nome: nomeEmpresa })
+    });
+    const d = await r.json();
+
+    if (d.error) throw new Error(d.error);
+
+    totalProcessos += (d.totalGeral || 0);
+    totalTribunais = (d.tribunais || []).filter(t => t.total > 0).length;
+
+    setDot(secDJ.dot, d.totalGeral > 0 ? 'warn' : 'ok');
+    setBadge(secDJ.badge, `${d.totalGeral || 0} processo(s)`, d.totalGeral > 0 ? 'has' : '');
+
+    // Render tribunal summary + process tables
+    const grupos = [
+      { label: 'Tribunais de Justiça Estaduais', ids: ['TJSP','TJRJ','TJMG','TJRS','TJSC','TJPR','TJBA','TJPE','TJCE'] },
+      { label: 'Tribunais Regionais Federais',   ids: ['TRF1','TRF2','TRF3','TRF4','TRF5'] },
+      { label: 'Trabalhista / Superior',          ids: ['TST','STJ','STF'] },
+    ];
+
+    const allTribunaisMap = {};
+    (d.tribunais || []).forEach(t => { allTribunaisMap[t.tribunal] = t; });
+    (d.erros || []).forEach(e => {
+      const k = e.tribunal.replace('api_publica_', '').toUpperCase();
+      if (!allTribunaisMap[k]) allTribunaisMap[k] = { tribunal: k, total: 0, erro: e.erro };
+    });
+
+    let html = '';
+
+    grupos.forEach(g => {
+      html += `<div class="trib-group"><div class="trib-group-title">${g.label}</div>`;
+      g.ids.forEach(id => {
+        const t = allTribunaisMap[id];
+        if (!t) {
+          html += `<div class="trib-row empty"><span class="trib-name">${id}</span><span class="trib-count tc-zero">Não consultado</span></div>`;
+          return;
+        }
+        const cls = t.erro ? 'trib-row' : (t.total > 0 ? 'trib-row found' : 'trib-row empty');
+        const cntCls = t.erro ? 'trib-count tc-err' : (t.total > 0 ? 'trib-count tc-found' : 'trib-count tc-zero');
+        const cntTxt = t.erro ? 'Erro' : (t.total > 0 ? t.total + ' processo(s)' : 'Nenhum');
+        html += `<div class="${cls}"><span class="trib-name">${id}</span><span class="${cntCls}">${cntTxt}</span></div>`;
+      });
+      html += `</div>`;
+    });
+
+    // Process table for tribunals that have results
+    const comResultados = (d.tribunais || []).filter(t => t.processos?.length > 0);
+    if (comResultados.length > 0) {
+      html += `<div style="margin-top:20px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Detalhamento dos Processos Encontrados</div>`;
+      html += `<div class="table-wrap"><table class="ptable">
+        <thead><tr><th>Número</th><th>Tribunal</th><th>Classe</th><th>Assunto</th><th>Data</th><th>Órgão Julgador</th><th>Valor da Causa</th></tr></thead>
+        <tbody>`;
+      comResultados.forEach(t => {
+        t.processos.forEach(p => {
+          const valor = p.valor
+            ? 'R$ ' + Number(p.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})
+            : '—';
+          const classe = p.classe || '—';
+          const pillCls = classe.toLowerCase().includes('exec') ? 'p-exec'
+            : classe.toLowerCase().includes('trab') ? 'p-trab'
+            : classe.toLowerCase().includes('crim') ? 'p-crim'
+            : 'p-civel';
+          html += `<tr>
+            <td class="pnum">${p.numero || '—'}</td>
+            <td><span class="pill ${pillCls}">${p.tribunal || '—'}</span></td>
+            <td style="color:var(--text)">${classe}</td>
+            <td>${p.assunto || '—'}</td>
+            <td>${p.dataAjuizamento ? p.dataAjuizamento.slice(0,10) : '—'}</td>
+            <td>${p.orgaoJulgador || '—'}</td>
+            <td style="color:var(--gold)">${valor}</td>
+          </tr>`;
+        });
+      });
+      html += `</tbody></table></div>`;
+    }
+
+    if (d.erros?.length > 0) {
+      html += `<div class="notice" style="margin-top:12px"><strong>ℹ ${d.erros.length} tribunal(is) com erro na consulta</strong> — isso pode ocorrer quando o DataJud está em manutenção ou o índice está temporariamente indisponível.</div>`;
+    }
+
+    secDJ.body.innerHTML = html;
+    stepDone(1); stepDone(2); stepDone(3);
+  } catch(e) {
+    setDot(secDJ.dot, 'err');
+    setBadge(secDJ.badge, 'Erro', 'err');
+    secDJ.body.innerHTML = `<div class="errmsg">⚠ DataJud indisponível: ${e.message}<br>
+      <a href="https://datajud-wiki.cnj.jus.br" target="_blank">→ Verificar status do DataJud</a></div>`;
+    stepFail(1); stepFail(2); stepFail(3);
+  }
+
+  setProgress(75, 'Consultando JusBrasil...');
+
+  // ── 3. JusBrasil ────────────────────────────────────
+  stepRun(5);
+  const secJB = mkSection(res, 'jb', 'JusBrasil — Consulta Pública', 'spin');
+  secJB.body.classList.add('open');
+  secJB.body.innerHTML = '<span class="spin"></span>Consultando JusBrasil...';
+
+  try {
+    const q = encodeURIComponent(nomeEmpresa || docRaw);
+    const r = await fetch(`${getAPI()}/api/jusbrasil/${q}`);
+    const d = await r.json();
+
+    if (d.error && !d.fallback) throw new Error(d.error);
+
+    if (d.processos?.length > 0) {
+      setDot(secJB.dot, 'warn');
+      setBadge(secJB.badge, `${d.processos.length} resultado(s)`, 'has');
+      const rows = d.processos.map(p => `
+        <tr>
+          <td class="pnum">${p.numero || '—'}</td>
+          <td>${p.tribunal || '—'}</td>
+          <td>${p.classe || '—'}</td>
+          <td>${p.partes || '—'}</td>
+          <td>${p.ultimaAtualizacao || '—'}</td>
+          <td>${p.url ? `<a href="${p.url}" target="_blank" style="color:var(--gold)">Ver →</a>` : '—'}</td>
+        </tr>`).join('');
+      secJB.body.innerHTML = `
+        <div class="table-wrap">
+          <table class="ptable">
+            <thead><tr><th>Número</th><th>Tribunal</th><th>Classe</th><th>Partes</th><th>Última Atualização</th><th>Link</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    } else {
+      setDot(secJB.dot, 'ok');
+      setBadge(secJB.badge, 'Sem resultados diretos');
+      secJB.body.innerHTML = `
+        <div style="color:var(--t3);font-size:12px;margin-bottom:12px">Nenhum processo encontrado via scraping automático.</div>
+        <a href="${d.fallback || `https://www.jusbrasil.com.br/consulta-processual/?q=${encodeURIComponent(nomeEmpresa || docRaw)}`}" 
+           target="_blank" class="btn btn-clr" style="display:inline-block;padding:8px 16px;text-decoration:none;font-size:10px">
+          → Consultar manualmente no JusBrasil
+        </a>
+        <div class="notice">O JusBrasil pode bloquear scraping automático. Use o link acima para busca manual.</div>`;
+    }
+    stepDone(5);
+  } catch(e) {
+    setDot(secJB.dot, 'err');
+    setBadge(secJB.badge, 'Indisponível', 'err');
+    secJB.body.innerHTML = `
+      <div class="errmsg">⚠ ${e.message}</div>
+      <div style="margin-top:10px">
+        <a href="https://www.jusbrasil.com.br/consulta-processual/?q=${encodeURIComponent(nomeEmpresa || docRaw)}" 
+           target="_blank" class="btn btn-clr" style="display:inline-block;padding:8px 16px;text-decoration:none;font-size:10px">
+          → Consultar manualmente no JusBrasil
+        </a>
+      </div>`;
+    stepFail(5);
+  }
+
+  // ── 4. Summary cards ────────────────────────────────
+  setProgress(95, 'Consolidando resultados...');
+
+  const sumDiv = document.createElement('div');
+  sumDiv.className = 'sumgrid';
+  sumDiv.style.marginBottom = '24px';
+  sumDiv.innerHTML = `
+    <div class="scard c-red"><div class="snum">${totalProcessos}</div><div class="slabel">Total de Processos</div></div>
+    <div class="scard c-gold"><div class="snum">${totalTribunais}</div><div class="slabel">Tribunais com Registros</div></div>
+    <div class="scard c-grn"><div class="snum">${STEPS.length}</div><div class="slabel">Fontes Consultadas</div></div>
+    <div class="scard c-purple"><div class="snum">—</div><div class="slabel">Valor Total Estimado</div></div>
+  `;
+  res.insertBefore(sumDiv, res.firstChild);
+
+  setProgress(100, 'Consulta concluída');
+  setTimeout(() => document.getElementById('prog-wrap').classList.remove('show'), 2000);
+
+  pesquisaAtiva = false;
+  btn.disabled = false;
+  btn.textContent = 'Pesquisar';
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function mkSection(container, id, title, dotState) {
+  const div = document.createElement('div');
+  div.className = 'section';
+  div.id = 'sec-' + id;
+  const dotCls = { spin: 'd-spin', ok: 'd-ok', warn: 'd-warn', err: 'd-err' }[dotState] || 'd-idle';
+  div.innerHTML = `
+    <div class="sec-head" onclick="toggle('${id}')">
+      <div class="sec-left">
+        <div class="rdot ${dotCls}" id="dot-${id}"></div>
+        <span class="sec-title">${title}</span>
+      </div>
+      <span class="badge" id="badge-${id}">—</span>
+    </div>
+    <div class="sec-body" id="body-${id}"></div>
+  `;
+  container.appendChild(div);
+  return { el: div, dot: document.getElementById(`dot-${id}`), badge: document.getElementById(`badge-${id}`), body: document.getElementById(`body-${id}`) };
+}
+
+function setDot(el, state) {
+  el.className = 'rdot ' + ({ ok: 'd-ok', warn: 'd-warn', err: 'd-err', spin: 'd-spin' }[state] || 'd-idle');
+}
+
+function setBadge(el, text, cls) {
+  el.textContent = text;
+  el.className = 'badge' + (cls ? ' ' + cls : '');
+}
+
+function toggle(id) {
+  const b = document.getElementById('body-' + id);
+  if (b) b.classList.toggle('open');
+}
+</script>
+</body>
+</html>
